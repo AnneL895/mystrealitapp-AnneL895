@@ -16,9 +16,48 @@ import numpy as np
 import altair as alt
 from datetime import datetime
 from datetime import time
+import plotly.express as px
 
 st.header("Hello world")
 
+st.write("selected_lang")
+
+
 df = pd.read_csv('st04_data copy.csv')
 
-st.write(df.head())
+import json
+
+with open("language_mapping.json", "r") as f:
+    lang_map = json.load(f)
+
+df["langCode"] = df["langCode"].replace(lang_map)
+
+#finding all the unique languages
+langs = df["langCode"].unique()
+
+#letting users interact with them and pick which ones to display
+selected_lang = st.multiselect(
+    "Pick a language to focus on",
+    options = langs,
+    default = langs
+)
+
+#filtering the data frame based on the selected languages
+langdf = df[df["langCode"].isin(selected_lang)]
+
+fig = px.line(
+    langdf,
+    x="Date",
+    y="pageviews",
+    color="langCode",
+    markers=True,
+    title="Pageviews by Language"
+)
+
+fig.update_layout(
+    xaxis_title="Date",
+    yaxis_title="Pageviews",
+    legend_title="Language"
+)
+
+st.plotly_chart(fig, use_container_width=True)
