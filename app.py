@@ -17,20 +17,20 @@ import altair as alt
 from datetime import datetime
 from datetime import time
 import plotly.express as px
-
-st.header("Hello world")
-
-st.write("selected_lang")
-
-
-df = pd.read_csv('st04_data copy.csv')
-
 import json
 
-with open("language_mapping.json", "r") as f:
-    lang_map = json.load(f)
+st.header("Exploring Pageviews by Language")
 
-df["langCode"] = df["langCode"].replace(lang_map)
+st.write("Select a language to see the pagviews for wikipedia articles in that language")
+st.write("Click multiple languages to compare data")
+
+df = pd.read_csv('st04_data.csv')
+
+with open("language_mapping.json", "r") as f:
+    langCodes = json.load(f)
+
+df["langCode"] = df["langCode"].replace(langCodes)
+
 
 #finding all the unique languages
 langs = df["langCode"].unique()
@@ -39,7 +39,6 @@ langs = df["langCode"].unique()
 selected_lang = st.multiselect(
     "Pick a language to focus on",
     options = langs,
-    default = langs
 )
 
 #filtering the data frame based on the selected languages
@@ -52,6 +51,31 @@ fig = px.line(
     color="langCode",
     markers=True,
     title="Pageviews by Language"
+)
+
+fig.update_layout(
+    xaxis_title="Date",
+    yaxis_title="Pageviews",
+    legend_title="Language"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+bottom25 = ["Lingua Franca Nova", "Gorontalo", "Low German", "Romansh", "Lojban", 
+            "Central Tibetan", "Pontic Greek", "Kabiye", "Ripuarian", "Zeelandic", 
+            "Moksha", "Doteli", "Alemannic German", "Norman", "Lezgian", "Inuktitut", 
+            "Pali", "Jamaican Patois", "Tok Pisin", "Kalmyk Oirat", "Cherokee", "Navajo", "Xhosa"]
+
+
+langdf2 = df[df["langCode"].isin(bottom25)]
+
+fig = px.line(
+    langdf2,
+    x="Date",
+    y="pageviews",
+    color="langCode",
+    markers=True,
+    title="Pageviews for the Bottom 25 Languages"
 )
 
 fig.update_layout(
