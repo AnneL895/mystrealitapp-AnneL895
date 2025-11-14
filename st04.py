@@ -26,11 +26,6 @@ st.write("Click multiple languages to compare data")
 
 df = pd.read_csv('st04_data.csv')
 
-with open("language_mapping.json", "r") as f:
-    langCodes = json.load(f)
-
-df["langCode"] = df["langCode"].replace(langCodes)
-
 
 #finding all the unique languages
 langs = df["langCode"].unique()
